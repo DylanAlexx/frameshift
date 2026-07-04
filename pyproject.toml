@@ -1,7 +1,7 @@
 [project]
 name = "frameshift"
 version = "0.1.0"
-description = "Add your description here"
+description = "An open-source media analysis platform for local video libraries."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
