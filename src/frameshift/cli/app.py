@@ -24,5 +24,9 @@ def scan(
     typer.echo(f"Scanning: {path}")
 
 
-if __name__ == "__main__":
+def main() -> None:
     app()
+
+
+if __name__ == "__main__":
+    main()
