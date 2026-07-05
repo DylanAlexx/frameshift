@@ -21,7 +21,7 @@ def scan(path: Path) -> None:
     count = 0
 
     for media_file in scan_media(path):
-        typer.echo(media_file)
+        typer.echo(media_file.path)
         count += 1
 
     typer.echo(f"\nFound {count} media file(s).")

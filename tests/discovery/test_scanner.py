@@ -18,8 +18,8 @@ def test_scan_finds_media_files(tmp_path: Path) -> None:
     files = list(scan(tmp_path))
 
     assert len(files) == 2
-    assert tmp_path / "movie.mkv" in files
-    assert tmp_path / "episode.mp4" in files
+    assert any(file.path == tmp_path / "movie.mkv" for file in files)
+    assert any(file.path == tmp_path / "episode.mp4" for file in files)
 
 
 def test_scan_ignores_non_media_files(tmp_path: Path) -> None:
@@ -30,7 +30,10 @@ def test_scan_ignores_non_media_files(tmp_path: Path) -> None:
 
     files = list(scan(tmp_path))
 
-    assert files == [tmp_path / "episode.mkv"]
+    assert len(files) == 1
+    assert files[0].path == tmp_path / "episode.mkv"
+    assert files[0].extension == ".mkv"
+    assert files[0].size == 0
 
 
 def test_scan_searches_subdirectories(tmp_path: Path) -> None:
@@ -42,7 +45,9 @@ def test_scan_searches_subdirectories(tmp_path: Path) -> None:
 
     files = list(scan(tmp_path))
 
-    assert files == [episode]
+    assert len(files) == 1
+    assert files[0].path == episode
+    assert files[0].extension == ".mkv"
 
 
 def test_scan_raises_for_missing_directory() -> None:

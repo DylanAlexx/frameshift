@@ -1,6 +1,8 @@
 from collections.abc import Iterator
 from pathlib import Path
 
+from frameshift.models.media_file import MediaFile
+
 _SUPPORTED_EXTENSIONS = {
     ".avi",
     ".flv",
@@ -19,7 +21,7 @@ def is_media_file(path: Path) -> bool:
     return path.is_file() and path.suffix.lower() in _SUPPORTED_EXTENSIONS
 
 
-def scan(path: Path) -> Iterator[Path]:
+def scan(path: Path) -> Iterator[MediaFile]:
     """Yield all supported media files under the given directory."""
 
     if not path.exists():
@@ -30,4 +32,8 @@ def scan(path: Path) -> Iterator[Path]:
 
     for item in path.rglob("*"):
         if is_media_file(item):
-            yield item
+            yield MediaFile(
+                path=item,
+                size=item.stat().st_size,
+                extension=item.suffix.lower(),
+            )

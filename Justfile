@@ -16,7 +16,7 @@ run:
     uv run frameshift --help
 
 scan path:
-    uv run frameshift scan {{path}}
+    uv run frameshift scan "{{path}}"
 
 fix:
     uv run ruff check --fix .
