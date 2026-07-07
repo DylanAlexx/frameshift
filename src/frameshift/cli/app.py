@@ -4,7 +4,8 @@ import typer
 
 from frameshift.discovery.scanner import scan as scan_media
 from frameshift.library.builder import build_library
-from frameshift.persistence.database import connect
+from frameshift.persistence.database import connect, initialize
+from frameshift.persistence.media_repository import save_library
 from frameshift.ui.console import console, render_scan_results, render_scan_summary
 
 app = typer.Typer(
@@ -20,15 +21,22 @@ def scan(path: Path) -> None:
     path = path.expanduser().resolve()
 
     connection = connect()
-    connection.close()
 
-    files = list(scan_media(path))
-    library = build_library(files)
+    try:
+        initialize(connection)
 
-    render_scan_summary(str(path), library)
-    render_scan_results(library)
+        files = list(scan_media(path))
+        library = build_library(files)
 
-    console.print(f"\n[bold green]Found {len(files)} media file(s).[/]")
+        save_library(connection, library)
+
+        render_scan_summary(str(path), library)
+        render_scan_results(library)
+
+        console.print(f"\n[bold green]Found {len(files)} media file(s).[/]")
+
+    finally:
+        connection.close()
 
 
 @app.command()
