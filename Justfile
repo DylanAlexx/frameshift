@@ -15,8 +15,8 @@ check:
 run:
     uv run frameshift --help
 
-scan path:
-    uv run frameshift scan "{{path}}"
+scan media_path:
+    uv run frameshift scan "{{media_path}}"
 
 fix:
     uv run ruff check --fix .

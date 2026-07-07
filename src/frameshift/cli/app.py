@@ -3,6 +3,8 @@ from pathlib import Path
 import typer
 
 from frameshift.discovery.scanner import scan as scan_media
+from frameshift.library.builder import build_library
+from frameshift.ui.console import console, render_scan_results, render_scan_summary
 
 app = typer.Typer(
     help="Analyze and understand local media libraries.",
@@ -16,21 +18,20 @@ def scan(path: Path) -> None:
 
     path = path.expanduser().resolve()
 
-    typer.echo(f"Scanning: {path}")
+    files = list(scan_media(path))
+    library = build_library(files)
 
-    count = 0
+    render_scan_summary(str(path), library)
+    render_scan_results(library)
 
-    for media_file in scan_media(path):
-        typer.echo(media_file.path)
-        count += 1
-
-    typer.echo(f"\nFound {count} media file(s).")
+    console.print(f"\n[bold green]Found {len(files)} media file(s).[/]")
 
 
 @app.command()
 def version() -> None:
     """Show version information."""
-    typer.echo("frameshift 0.1.0")
+
+    console.print("[bold]FrameShift[/] v0.1.0")
 
 
 def main() -> None:

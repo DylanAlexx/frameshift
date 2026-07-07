@@ -2,6 +2,7 @@ from collections.abc import Iterator
 from pathlib import Path
 
 from frameshift.models.media_file import MediaFile
+from frameshift.parser.media_parser import parse_filename
 
 _SUPPORTED_EXTENSIONS = {
     ".avi",
@@ -36,4 +37,5 @@ def scan(path: Path) -> Iterator[MediaFile]:
                 path=item,
                 size=item.stat().st_size,
                 extension=item.suffix.lower(),
+                parsed=parse_filename(item.name),
             )
