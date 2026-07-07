@@ -4,6 +4,7 @@ import typer
 
 from frameshift.discovery.scanner import scan as scan_media
 from frameshift.library.builder import build_library
+from frameshift.persistence.database import connect
 from frameshift.ui.console import console, render_scan_results, render_scan_summary
 
 app = typer.Typer(
@@ -17,6 +18,9 @@ def scan(path: Path) -> None:
     """Scan a media directory and list all media files."""
 
     path = path.expanduser().resolve()
+
+    connection = connect()
+    connection.close()
 
     files = list(scan_media(path))
     library = build_library(files)
