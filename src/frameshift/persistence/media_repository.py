@@ -24,7 +24,7 @@ def save_library(connection: Connection, library: Library) -> None:
                 None,
             )
         )
-        
+
     # TV Episodes
     for series in library.series:
         for media_file in series.episodes:

@@ -9,7 +9,8 @@ def connect(database: Path = DEFAULT_DATABASE) -> sqlite3.Connection:
 
     database.parent.mkdir(parents=True, exist_ok=True)
 
-    return sqlite3.connect(database) 
+    return sqlite3.connect(database)
+
 
 def initialize(connection: sqlite3.Connection) -> None:
     """Create the database schema if it does not already exist."""
