@@ -8,6 +8,7 @@ __pycache__/
 
 # IDE
 .vscode/
+.idea/
 
 # OS
 .DS_Store
@@ -18,3 +19,8 @@ Thumbs.db
 
 # Ruff
 .ruff_cache/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
