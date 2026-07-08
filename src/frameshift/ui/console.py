@@ -6,6 +6,8 @@ from frameshift.models.library import Library
 
 console = Console()
 
+console.rule("[bold cyan]FrameShift[/]")
+
 
 def format_size(size: int) -> str:
     """Convert bytes into a human-readable size."""
@@ -40,7 +42,7 @@ def render_scan_summary(path: str, library: Library) -> None:
         f"[bold]📂 Directory:[/] {path}\n"
         f"🎬 Movies: {movie_count}\n"
         f"📺 TV Series: {series_count}\n"
-        f"📼 TV Episodes: {episode_count}\n"
+        f"📼 Episodes: {episode_count}\n"
         f"❓ Unknown: {unknown_count}\n"
         f"💾 Total Size: {format_size(total_size)}"
     )
@@ -61,18 +63,42 @@ def render_scan_results(library: Library) -> None:
     # Movies
     #
     if library.movies:
-        table = Table(title="🎬 Movies")
+        movie_size = sum(movie.size for movie in library.movies)
+
+        console.print()
+
+        console.print(
+            Panel(
+                (
+                    "[bold]🎬 Movies[/]\n\n"
+                    f"[cyan]Count:[/] {len(library.movies)}\n"
+                    f"[cyan]Size :[/] {format_size(movie_size)}"
+                ),
+                expand=False,
+                border_style="cyan",
+            )
+        )
+
+        table = Table(show_header=True)
 
         table.add_column("Title")
         table.add_column("Year", justify="center")
+        table.add_column("Video", justify="center")
         table.add_column("Size", justify="right")
 
-        for movie in library.movies:
+        for movie in sorted(
+            library.movies,
+            key=lambda movie: (
+                movie.parsed.title or "",
+                movie.parsed.year or 0,
+            ),
+        ):
             parsed = movie.parsed
 
             table.add_row(
                 parsed.title or movie.path.stem,
                 str(parsed.year or "-"),
+                parsed.resolution or "[dim]-[/]",
                 format_size(movie.size),
             )
 
@@ -82,33 +108,95 @@ def render_scan_results(library: Library) -> None:
     # TV Series
     #
     for series in library.series:
-        table = Table(title=f"📺 {series.title}")
+        console.print()
 
-        table.add_column("Season", justify="center")
-        table.add_column("Episode", justify="center")
-        table.add_column("Size", justify="right")
+        episode_count = len(series.episodes)
 
-        for episode in series.episodes:
-            parsed = episode.parsed
+        season_count = len(
+            {
+                episode.parsed.season
+                for episode in series.episodes
+                if episode.parsed.season is not None
+            }
+        )
 
-            table.add_row(
-                str(parsed.season or "-"),
-                str(parsed.episode or "-"),
-                format_size(episode.size),
+        total_size = sum(episode.size for episode in series.episodes)
+
+        console.print(
+            Panel(
+                (
+                    f"[bold]📺 {series.title}[/]\n\n"
+                    f"[cyan]Seasons :[/] {season_count}\n"
+                    f"[cyan]Episodes:[/] {episode_count}\n"
+                    f"[cyan]Size     :[/] {format_size(total_size)}"
+                ),
+                expand=False,
+                border_style="cyan",
+            )
+        )
+
+        seasons = sorted(
+            {
+                episode.parsed.season
+                for episode in series.episodes
+                if episode.parsed.season is not None
+            }
+        )
+
+        for season_number in seasons:
+            console.print(f"\n[bold]Season {season_number}[/]")
+
+            table = Table(show_header=True)
+
+            table.add_column("Episode", justify="center")
+            table.add_column("Video", justify="center")
+            table.add_column("Size", justify="right")
+
+            season_episodes = sorted(
+                (episode for episode in series.episodes if episode.parsed.season == season_number),
+                key=lambda episode: episode.parsed.episode or 0,
             )
 
-        console.print(table)
+            for episode in season_episodes:
+                parsed = episode.parsed
+
+                table.add_row(
+                    f"E{parsed.episode:02}",
+                    parsed.resolution or "-",
+                    format_size(episode.size),
+                )
+
+            console.print(table)
 
     #
     # Unknown
     #
     if library.unknown:
-        table = Table(title="❓ Unknown")
+        unknown_size = sum(file.size for file in library.unknown)
+
+        console.print()
+
+        console.print(
+            Panel(
+                (
+                    "[bold]❓ Unknown Files[/]\n\n"
+                    f"[cyan]Count:[/] {len(library.unknown)}\n"
+                    f"[cyan]Size :[/] {format_size(unknown_size)}"
+                ),
+                expand=False,
+                border_style="yellow",
+            )
+        )
+
+        table = Table(show_header=True)
 
         table.add_column("Filename")
         table.add_column("Size", justify="right")
 
-        for media_file in library.unknown:
+        for media_file in sorted(
+            library.unknown,
+            key=lambda file: file.path.name.lower(),
+        ):
             table.add_row(
                 media_file.path.name,
                 format_size(media_file.size),

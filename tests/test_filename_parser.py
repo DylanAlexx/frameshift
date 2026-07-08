@@ -56,3 +56,15 @@ def test_parses_tv_show_x_format() -> None:
     assert parsed.title == "The Office"
     assert parsed.season == 2
     assert parsed.episode == 14
+
+
+def test_parses_1080p_resolution() -> None:
+    parsed = parse_filename("Oppenheimer.2023.1080p.BluRay.x264.mkv")
+
+    assert parsed.resolution == "1080p"
+
+
+def test_parses_2160p_resolution() -> None:
+    parsed = parse_filename("The.Batman.2022.2160p.WEB.x265.mkv")
+
+    assert parsed.resolution == "2160p"

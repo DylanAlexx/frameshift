@@ -28,7 +28,8 @@ def initialize(connection: sqlite3.Connection) -> None:
             title TEXT,
             year INTEGER,
             season INTEGER,
-            episode INTEGER
+            episode INTEGER,
+            resolution TEXT
         )
         """
     )

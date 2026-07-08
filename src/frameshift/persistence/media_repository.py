@@ -27,6 +27,7 @@ def save_library(connection: Connection, library: Library) -> None:
                 parsed.year,
                 None,
                 None,
+                parsed.resolution,
             )
         )
 
@@ -45,6 +46,7 @@ def save_library(connection: Connection, library: Library) -> None:
                     parsed.year,
                     parsed.season,
                     parsed.episode,
+                    parsed.resolution,
                 )
             )
 
@@ -62,6 +64,7 @@ def save_library(connection: Connection, library: Library) -> None:
                 parsed.year,
                 parsed.season,
                 parsed.episode,
+                parsed.resolution,
             )
         )
 
@@ -75,9 +78,10 @@ def save_library(connection: Connection, library: Library) -> None:
             title,
             year,
             season,
-            episode
+            episode,
+            resolution
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(path)
         DO UPDATE SET
             size = excluded.size,
@@ -86,7 +90,8 @@ def save_library(connection: Connection, library: Library) -> None:
             title = excluded.title,
             year = excluded.year,
             season = excluded.season,
-            episode = excluded.episode
+            episode = excluded.episode,
+            resolution = excluded.resolution
         """,
         rows,
     )
@@ -107,7 +112,8 @@ def load_library(connection: sqlite3.Connection) -> Library:
             title,
             year,
             season,
-            episode
+            episode,
+            resolution
         FROM media_files
         ORDER BY title
         """
@@ -122,6 +128,7 @@ def load_library(connection: sqlite3.Connection) -> Library:
             year=row["year"],
             season=row["season"],
             episode=row["episode"],
+            resolution=row["resolution"],
         )
 
         media_files.append(

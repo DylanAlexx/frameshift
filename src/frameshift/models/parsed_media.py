@@ -15,3 +15,4 @@ class ParsedMedia:
     year: int | None = None
     season: int | None = None
     episode: int | None = None
+    resolution: str | None = None
