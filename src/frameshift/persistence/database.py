@@ -1,21 +1,24 @@
 import sqlite3
-from pathlib import Path
 
-DEFAULT_DATABASE = Path("frameshift.db")
+from frameshift.config import APP_DIR, DATABASE_PATH
 
 
-def connect(database: Path = DEFAULT_DATABASE) -> sqlite3.Connection:
+def connect() -> sqlite3.Connection:
     """Open (or create) the FrameShift database."""
 
-    database.parent.mkdir(parents=True, exist_ok=True)
+    APP_DIR.mkdir(parents=True, exist_ok=True)
 
-    return sqlite3.connect(database)
+    connection = sqlite3.connect(DATABASE_PATH)
+    connection.row_factory = sqlite3.Row
+
+    return connection
 
 
 def initialize(connection: sqlite3.Connection) -> None:
     """Create the database schema if it does not already exist."""
 
-    connection.execute("""
+    connection.execute(
+        """
         CREATE TABLE IF NOT EXISTS media_files (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             path TEXT NOT NULL UNIQUE,
@@ -27,6 +30,7 @@ def initialize(connection: sqlite3.Connection) -> None:
             season INTEGER,
             episode INTEGER
         )
-    """)
+        """
+    )
 
     connection.commit()

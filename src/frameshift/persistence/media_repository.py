@@ -1,6 +1,11 @@
+import sqlite3
+from pathlib import Path
 from sqlite3 import Connection
 
+from frameshift.library.builder import build_library
 from frameshift.models.library import Library
+from frameshift.models.media_file import MediaFile
+from frameshift.models.parsed_media import MediaType, ParsedMedia
 
 
 def save_library(connection: Connection, library: Library) -> None:
@@ -87,3 +92,45 @@ def save_library(connection: Connection, library: Library) -> None:
     )
 
     connection.commit()
+
+
+def load_library(connection: sqlite3.Connection) -> Library:
+    """Load the media library from the database."""
+
+    rows = connection.execute(
+        """
+        SELECT
+            path,
+            size,
+            extension,
+            media_type,
+            title,
+            year,
+            season,
+            episode
+        FROM media_files
+        ORDER BY title
+        """
+    ).fetchall()
+
+    media_files: list[MediaFile] = []
+
+    for row in rows:
+        parsed = ParsedMedia(
+            media_type=MediaType(row["media_type"]),
+            title=row["title"],
+            year=row["year"],
+            season=row["season"],
+            episode=row["episode"],
+        )
+
+        media_files.append(
+            MediaFile(
+                path=Path(row["path"]),
+                size=row["size"],
+                extension=row["extension"],
+                parsed=parsed,
+            )
+        )
+
+    return build_library(media_files)

@@ -21,3 +21,6 @@ scan media_path:
 fix:
     uv run ruff check --fix .
     uv run ruff format .
+
+library:
+    uv run frameshift library
